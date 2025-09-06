@@ -11,6 +11,6 @@ books_by_author = author.books.all()
 print(books_by_author)
 
 # Example: Get all books in a specific library
-library = Library.objects.get(id=1)
+library = Library.objects.get(name=library_name)
 books_in_library = library.books.all()
 print(books_in_library)
