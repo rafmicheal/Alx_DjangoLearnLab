@@ -1,16 +1,12 @@
-from bookshelf.models import Book
-from relationship_app.models import Author, Library
+from relationship_app.models import Author, Book, Library, Librarian
 
-# Example: Get all books
-all_books = Book.objects.all()
-print(all_books)
+# 1. Query all books by a specific author
+author = Author.objects.get(name="George Orwell")
+books_by_author = Book.objects.filter(author=author)
 
-# Example: Get all books by a specific author
-author = Author.objects.get(id=1)
-books_by_author = author.books.all()
-print(books_by_author)
-
-# Example: Get all books in a specific library
-library = Library.objects.get(name=library_name)
+# 2. List all books in a library
+library = Library.objects.get(name="Central Library")
 books_in_library = library.books.all()
-print(books_in_library)
+
+# 3. Retrieve the librarian for a library
+librarian = Librarian.objects.get(library=library)
