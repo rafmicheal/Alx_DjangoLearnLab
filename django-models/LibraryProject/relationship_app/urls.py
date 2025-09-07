@@ -1,3 +1,4 @@
+from . import views
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 from . import views  # import the whole views module instead of just register
@@ -19,3 +20,10 @@ urlpatterns = [
 path('admin-view/', views.admin_view, name='admin_view'),
 path('librarian-view/', views.librarian_view, name='librarian_view'),
 path('member-view/', views.member_view, name='member_view'),
+
+
+urlpatterns = [
+    path('admin-view/', views.admin_view, name='admin_view'),
+    path('librarian-view/', views.librarian_view, name='librarian_view'),
+    path('member-view/', views.member_view, name='member_view'),
+]
