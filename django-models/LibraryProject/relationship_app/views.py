@@ -1,27 +1,22 @@
-from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import post_save
-from django.contrib.auth.models import User
-from django.shortcuts import render
-from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import permission_required
+from .models import Book
+from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.views.generic import DetailView
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
-from .models import Book, Library   # required for both tasks
+from .models import Book, Library
+
+# -------------------------------
+# Task 2: Book & Library Views
+# -------------------------------
 
 
-# --------------------
-# Task 2 Views
-# --------------------
-
-# Function-based view
 def list_books(request):
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
-
-# Class-based view
 
 
 class LibraryDetailView(DetailView):
@@ -29,127 +24,87 @@ class LibraryDetailView(DetailView):
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
 
+# -------------------------------
+# Task 3: Role-Based Access Views
+# -------------------------------
 
-# --------------------
-# Task 3 Views (Authentication)
-# --------------------
 
-# User registration view
-def register_view(request):
+def is_admin(user):
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+
+
+def is_librarian(user):
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
+
+
+def is_member(user):
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+
+
+@user_passes_test(is_admin)
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+
+@user_passes_test(is_member)
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
+
+# -------------------------------
+# Authentication Views
+# -------------------------------
+
+
+def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # auto login after register
+            login(request, user)
             return redirect('list_books')
     else:
         form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
-
-# User login view
 
 
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
+            user = authenticate(username=form.cleaned_data['username'],
+                                password=form.cleaned_data['password'])
+            if user:
                 login(request, user)
                 return redirect('list_books')
             else:
-                messages.error(request, "Invalid username or password")
+                messages.error(request, "Invalid credentials")
     else:
         form = AuthenticationForm()
     return render(request, 'relationship_app/login.html', {'form': form})
 
-# User logout view
+
+# -------------------------------
+# Task 4: Permission-Protected Book Views
+# -------------------------------
 
 
-def logout_view(request):
-    logout(request)
-    return render(request, 'relationship_app/logout.html')
+@permission_required('relationship_app.can_add_book')
+def add_book(request):
+    return render(request, 'relationship_app/add_book.html')
 
 
-# --- Role checks ---
+@permission_required('relationship_app.can_change_book')
+def edit_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    return render(request, 'relationship_app/edit_book.html', {'book': book})
 
 
-def is_admin(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
-
-
-def is_librarian(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
-
-
-def is_member(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
-
-
-# --- Role-based views ---
-@user_passes_test(is_admin)
-def admin_view(request):
-    return render(request, 'relationship_app/admin_view.html')
-
-
-@user_passes_test(is_librarian)
-def librarian_view(request):
-    return render(request, 'relationship_app/librarian_view.html')
-
-
-@user_passes_test(is_member)
-def member_view(request):
-    return render(request, 'relationship_app/member_view.html')
-
-
-# Check functions
-
-
-def is_admin(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
-
-
-def is_librarian(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
-
-
-def is_member(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
-
-
-# Views restricted by role
-@user_passes_test(is_admin)
-def admin_view(request):
-    return render(request, 'relationship_app/admin_view.html')
-
-
-@user_passes_test(is_librarian)
-def librarian_view(request):
-    return render(request, 'relationship_app/librarian_view.html')
-
-
-@user_passes_test(is_member)
-def member_view(request):
-    return render(request, 'relationship_app/member_view.html')
-
-
-class UserProfile(models.Model):
-    ROLE_CHOICES = (
-        ('Admin', 'Admin'),
-        ('Librarian', 'Librarian'),
-        ('Member', 'Member'),
-    )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.role}"
-
-
-# Signal to automatically create UserProfile when a new User is created
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
+@permission_required('relationship_app.can_delete_book')
+def delete_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    return render(request, 'relationship_app/delete_book.html', {'book': book})
