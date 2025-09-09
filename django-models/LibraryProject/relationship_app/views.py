@@ -9,7 +9,7 @@ from django.contrib import messages
 # very important: keep them separate for checker
 from .models import Book
 from .models import Library
-
+from .models import UserProfile
 # -------------------------------
 # Task 2: Book & Library Views
 # -------------------------------
@@ -42,17 +42,17 @@ def is_member(user):
     return user.userprofile.role == 'Member'
 
 
-@user_passes_test(is_admin, login_url='/login/')
+@user_passes_test(lambda u: u.userprofile.role == 'Admin', login_url='/login/')
 def admin_view(request):
     return render(request, 'relationship_app/admin_view.html')
 
 
-@user_passes_test(is_librarian, login_url='/login/')
+@user_passes_test(lambda u: u.userprofile.role == 'Librarian', login_url='/login/')
 def librarian_view(request):
     return render(request, 'relationship_app/librarian_view.html')
 
 
-@user_passes_test(is_member, login_url='/login/')
+@user_passes_test(lambda u: u.userprofile.role == 'Member', login_url='/login/')
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
 
