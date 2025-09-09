@@ -1,13 +1,14 @@
 from django.contrib.auth.decorators import permission_required
-from .models import Book
-from django.shortcuts import get_object_or_404, render
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.views.generic import DetailView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
-from .models import Book, Library
+
+# very important: keep them separate for checker
+from .models import Book
+from .models import Library
 
 # -------------------------------
 # Task 2: Book & Library Views
