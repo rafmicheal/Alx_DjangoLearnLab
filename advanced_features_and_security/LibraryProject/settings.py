@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Your apps
+    'bookshelf.apps.BookshelfConfig',
     'accounts.apps.AccountsConfig',
-    'LibraryProject.bookshelf',
     'relationship_app',
 ]
 
@@ -125,6 +126,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# LibraryProject/settings.py
+# Tell Django to use your custom user
+AUTH_USER_MODEL = 'bookshelf.CustomUser'
+
+# Where users are redirected for login
 LOGIN_URL = '/login/'
-AUTH_USER_MODEL = 'accounts.CustomUser'
