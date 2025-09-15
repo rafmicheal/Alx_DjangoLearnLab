@@ -11,3 +11,9 @@ urlpatterns = [
     # Include your app URLs
     path('', include('relationship_app.urls')),
 ]
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # Include bookshelf app URLs
+    path('bookshelf/', include('bookshelf.urls')),
+]
