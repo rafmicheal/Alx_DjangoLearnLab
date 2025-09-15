@@ -109,3 +109,35 @@ def edit_book(request, pk):
 def delete_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     return render(request, 'relationship_app/delete_book.html', {'book': book})
+
+# list_books: require view permission
+
+
+@permission_required('bookshelf.can_view', raise_exception=True)
+def list_books(request):
+    books = Book.objects.all()
+    return render(request, 'relationship_app/list_books.html', {'books': books})
+
+# add_book: require create permission
+
+
+@permission_required('bookshelf.can_create', raise_exception=True)
+def add_book(request):
+    # your existing create logic (or placeholder)
+    return render(request, 'relationship_app/add_book.html')
+
+# edit_book: require edit permission
+
+
+@permission_required('bookshelf.can_edit', raise_exception=True)
+def edit_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    return render(request, 'relationship_app/edit_book.html', {'book': book})
+
+# delete_book: require delete permission
+
+
+@permission_required('bookshelf.can_delete', raise_exception=True)
+def delete_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    return render(request, 'relationship_app/delete_book.html', {'book': book})
