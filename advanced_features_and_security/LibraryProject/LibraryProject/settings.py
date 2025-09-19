@@ -104,3 +104,6 @@ CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = "DENY"  # prevents clickjacking
 SECURE_CONTENT_TYPE_NOSNIFF = True  # prevents MIME sniffing
 SECURE_BROWSER_XSS_FILTER = True  # enables browser XSS filter
+
+# Detect secure connections if Django is behind a proxy/load balancer
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
