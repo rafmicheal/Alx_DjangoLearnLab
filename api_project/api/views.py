@@ -1,20 +1,26 @@
 from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+
 from .models import Book
 from .serializers import BookSerializer
 
-# ✅ Existing ListAPIView (keep this for checker)
+# Optional: keep the public list endpoint (if you want unauthenticated users to view)
 
 
 class BookList(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    # public list — remove or change to IsAuthenticated if you want it protected
+    permission_classes = [AllowAny]
+
+# Protected CRUD ViewSet
 
 
-# ✅ New ViewSet for full CRUD
 class BookViewSet(viewsets.ModelViewSet):
-    """
-    A ViewSet for viewing, creating, updating, and deleting Books.
-    DRF handles GET, POST, PUT, DELETE automatically here.
-    """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+
+    # explicitly set auth + permission for clarity (defaults already set in settings.py)
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
