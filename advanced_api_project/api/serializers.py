@@ -4,10 +4,6 @@ import datetime
 
 
 class BookSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the Book model with validation to prevent
-    future publication years.
-    """
     class Meta:
         model = Book
         fields = '__all__'
@@ -21,9 +17,6 @@ class BookSerializer(serializers.ModelSerializer):
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the Author model including nested books.
-    """
     books = BookSerializer(many=True, read_only=True)
 
     class Meta:
