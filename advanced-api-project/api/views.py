@@ -1,44 +1,46 @@
 # api/views.py
-from rest_framework import generics, permissions
+from rest_framework import generics
+# <- required import
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Book
 from .serializers import BookSerializer
 
-# List all books (public)
+# ListView – all users can read
 
 
 class ListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
-# Get details of a single book (public)
+# DetailView – all users can read
 
 
 class DetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
-# Create a new book (authenticated only)
+# CreateView – only authenticated users can create
 
 
 class CreateView(generics.CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-# Update an existing book (authenticated only)
+# UpdateView – only authenticated users can update
 
 
 class UpdateView(generics.UpdateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-# Delete a book (authenticated only)
+# DeleteView – only authenticated users can delete
 
 
 class DeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
