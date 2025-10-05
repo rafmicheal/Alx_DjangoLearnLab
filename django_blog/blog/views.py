@@ -1,40 +1,63 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, ProfileForm
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views import generic
+from .models import Post
+from .forms import PostForm
+
+# ListView: anyone can see posts
 
 
-def register_view(request):
-    """
-    Handle new user registration.
-    """
-    if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            # email is already present via form
-            user.email = form.cleaned_data.get("email")
-            user.save()
-            # Log the user in immediately after registration (optional)
-            login(request, user)
-            return redirect("blog:profile")
-    else:
-        form = CustomUserCreationForm()
-    return render(request, "blog/register.html", {"form": form})
+class PostListView(generic.ListView):
+    model = Post
+    template_name = 'blog/post_list.html'   # blog/templates/blog/post_list.html
+    context_object_name = 'posts'
+    paginate_by = 10  # optional
+
+# DetailView: anyone can view post details
 
 
-@login_required
-def profile_view(request):
-    """
-    Show and edit user profile.
-    """
-    profile = request.user.profile
-    if request.method == "POST":
-        pform = ProfileForm(request.POST, request.FILES, instance=profile)
-        if pform.is_valid():
-            pform.save()
-            return redirect("blog:profile")
-    else:
-        pform = ProfileForm(instance=profile)
+class PostDetailView(generic.DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'
+    context_object_name = 'post'
 
-    return render(request, "blog/profile.html", {"pform": pform})
+# CreateView: only logged-in users
+
+
+class PostCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html'
+    login_url = 'login'  # adjust if your login url name differs
+
+    def form_valid(self, form):
+        # set the author to the currently logged in user
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+# UpdateView: only author can update
+
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html'
+    login_url = 'login'
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
+
+# DeleteView: only author can delete
+
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+    model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('blog:post_list')
+    login_url = 'login'
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
