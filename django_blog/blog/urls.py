@@ -2,26 +2,18 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # List of all posts (homepage)
     path('', views.PostListView.as_view(), name='home'),
-
-    # Create a new post
     path('post/new/', views.PostCreateView.as_view(), name='post-create'),
-
-    # View a single post
     path('post/<int:pk>/', views.PostDetailView.as_view(), name='post-detail'),
-
-    # Update an existing post
     path('post/<int:pk>/update/', views.PostUpdateView.as_view(), name='post-update'),
-
-    # Delete a post
     path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post-delete'),
 
-    # Comment CBVs
-    path('post/<int:pk>/comments/new/',
-         views.CommentCreateView.as_view(), name='comment-create'),
-    path('comment/<int:pk>/update/',
-         views.CommentUpdateView.as_view(), name='comment-update'),
-    path('comment/<int:pk>/delete/',
-         views.CommentDeleteView.as_view(), name='comment-delete'),
+    # Comment URLs
+    path('post/<int:post_id>/comments/new/',
+         views.comment_create, name='comment-create'),
+    path('comment/<int:pk>/update/', views.comment_update, name='comment-update'),
+    path('comment/<int:pk>/delete/', views.comment_delete, name='comment-delete'),
+
+    # Tag and search URLs
+    path('tags/<str:tag_name>/', views.TagPostListView.as_view(), name='tag-posts'),
 ]
