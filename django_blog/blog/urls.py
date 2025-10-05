@@ -11,9 +11,10 @@ urlpatterns = [
     # Comment URLs
     path('post/<int:post_id>/comments/new/',
          views.comment_create, name='comment-create'),
-    path('comment/<int:pk>/update/', views.comment_update, name='comment-update'),
-    path('comment/<int:pk>/delete/', views.comment_delete, name='comment-delete'),
+    path('comments/<int:pk>/edit/', views.comment_update, name='comment-update'),
+    path('comments/<int:pk>/delete/', views.comment_delete, name='comment-delete'),
 
-    # Tag and search URLs
-    path('tags/<str:tag_name>/', views.TagPostListView.as_view(), name='tag-posts'),
+    # Tag filtering URL
+    path('tags/<slug:tag_slug>/',
+         views.PostByTagListView.as_view(), name='posts-by-tag'),
 ]

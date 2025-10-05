@@ -1,3 +1,6 @@
+from django.views.generic import ListView
+from taggit.models import Tag
+from .models import Post
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -63,6 +66,18 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/posts_by_tag.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        tag_slug = self.kwargs.get('tag_slug')
+        if tag_slug:
+            return Post.objects.filter(tags__slug=tag_slug).order_by('-published_date')
+        return Post.objects.all()
 
 # COMMENT VIEWS
 
