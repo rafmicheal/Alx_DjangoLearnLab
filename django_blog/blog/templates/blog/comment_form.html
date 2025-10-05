@@ -1,0 +1,10 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<h2>{{ form.instance.pk|yesno:"Edit Comment,New Comment" }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+<a href="{% url 'post-detail' form.instance.post.pk %}">Back to Post</a>
+{% endblock %}
