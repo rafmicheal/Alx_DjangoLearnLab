@@ -10,7 +10,7 @@ urlpatterns = [
          name='post_create'),            # /posts/new/
     path('posts/<int:pk>/', views.PostDetailView.as_view(),
          name='post_detail'),       # /posts/<pk>/
-    path('posts/<int:pk>/edit/', views.PostUpdateView.as_view(),
+    path('posts/<int:pk>/update/', views.PostUpdateView.as_view(),
          name='post_update'),  # /posts/<pk>/edit/
     path('posts/<int:pk>/delete/', views.PostDeleteView.as_view(),
          name='post_delete'),  # /posts/<pk>/delete/
