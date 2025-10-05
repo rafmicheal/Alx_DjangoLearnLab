@@ -18,10 +18,10 @@ urlpatterns = [
     path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post-delete'),
 
     # Comment CBVs
-    path('posts/<int:pk>/comments/new/',
+    path('post/<int:pk>/comments/new/',
          views.CommentCreateView.as_view(), name='comment-create'),
-    path('comments/<int:pk>/update/',
+    path('comment/<int:pk>/update/',
          views.CommentUpdateView.as_view(), name='comment-update'),
-    path('comments/<int:pk>/delete/',
+    path('comment/<int:pk>/delete/',
          views.CommentDeleteView.as_view(), name='comment-delete'),
 ]
