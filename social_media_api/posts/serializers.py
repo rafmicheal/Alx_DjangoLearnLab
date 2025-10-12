@@ -1,3 +1,4 @@
+from .models import Post, Comment, Like
 from rest_framework import serializers
 from django.conf import settings
 from .models import Post, Comment
@@ -32,3 +33,10 @@ class PostSerializer(serializers.ModelSerializer):
         if not value.strip():
             raise serializers.ValidationError("Title cannot be empty.")
         return value
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = ['id', 'user', 'post', 'created_at']
+        read_only_fields = ['id', 'user', 'created_at']
